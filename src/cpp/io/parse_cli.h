@@ -24,7 +24,7 @@ auto build_parser(std::string const& name, std::string const& version) {
             .help("specify the gene alignment distance matrix in PHYLIP format");
 
     program.add_argument("-t", "--starting-tree")
-            .help("specify the gene tree to compute dup/loss on (NEWICK format");
+            .help("specify the gene tree to compute dup/loss on (NEWICK format)");
 
     // r := tag and reroot algorithm
     program.add_argument("-r", "--tag-algo")
