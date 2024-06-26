@@ -9,6 +9,41 @@ algorithm that respects the species tree and can infer gene family trees.
 
 ### Usage
 
+Clone and build the repository.
+```
+git clone https://github.com/knirschl/Spearfish.git
+cd Spearfish
+mkdir build
+cd build
+cmake ..
+make
+```
+
+Spearfish supports multiple runmodi which can be selected by calling it with
+different parameters:
+  - Required
+    - `s`, `--species-mat`: specify the species tree distance matrix in PHYLIP format
+    - `-a`, `--align-mat`: specify the gene alignment distance matrix in PHYLIP format
+  - OPTIONAL
+    - -`t`, `--starting-tree`: specify the gene tree to compute dup/loss on
+    (NEWICK format)
+    - -`r`, `--tag-algo`: tag and reroot algorithm
+      - `0`: APro (default)
+      - `1`: MAD
+      - `2`: None (everything gets corrected)
+    - `-c`, `--compute-tree`: compute selection
+      - `0`: only tree
+      - `1`: tree and matrix
+      - `2`: only matrix (default)
+    - `p`, `--prefix`: specify the output prefix relative to working directory
+    (default: `/`)
+    - `-m`, `--map`: supply mapping file between species and locus names
+    (default: "")
+    - `l`: if set, mapping file maps locus names to species names, else other
+    way around (default: unset)
+    - `-d`, `--delimiter`: mapping separator
+
+
 ### Dependencies
 
 Spearfish uses multiple Python packages to pre-process the input data, as well
