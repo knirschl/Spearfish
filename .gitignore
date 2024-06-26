@@ -1,0 +1,9 @@
+.idea/
+cmake-build-debug/
+__pycache__/
+.venv/
+.vscode/
+/cmake-build-debug-coverage/
+output/
+build/
+historic.txt
