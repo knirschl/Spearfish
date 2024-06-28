@@ -7,6 +7,16 @@ Spearfish (<b>SPE</b>cies tree <b>A</b>ware gene t<b>R</b>ee in<b>F</b>erence
 with d<b>IS</b>tance met<b>H</b>ods) is a distance-based tree inference
 algorithm that respects the species tree and can infer gene family trees.
 
+
+## TODO
+
+- [ ] src/
+  - [ ] Clean up, better tree
+    - [ ] Use less 3rd party
+  - [ ] precomputations in cpp?
+- [ ] License
+
+
 ### Usage
 
 Clone and build the repository.
