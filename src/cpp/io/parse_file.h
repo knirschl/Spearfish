@@ -70,6 +70,7 @@ std::pair<matrix_t<T>, vector_t<std::string>> parse_phylip(std::ifstream &reader
                 }
                 line = results.suffix();
             }
+        }
             /*
             // just split on space
             inner_counter = -1;
