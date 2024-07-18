@@ -208,7 +208,7 @@ def eval_and_pick(datadir, results_dir):
   best_logL = {}
   for family in os.listdir(results_dir):
     true_family, tree = family.split(">")
-    cleaned = tree.replace("ba.", "").replace("fastme.", "")
+    cleaned = tree.replace("spearfish.", "").replace("fastme.", "")
     idx = 0 if "a." in cleaned else (1 if "m." in cleaned else 2)
     if (true_family not in best_tree):
       best_tree[true_family] = 3 * [""]
@@ -258,8 +258,9 @@ def run(datadir, subst_model, strategy, species_tree, starting_tree, cores, addi
   start = time.time()
   if (not empty):
     run_generax(datadir, subst_model, strategy, rec_model, species_tree, generax_families_file, mode, cores, resultsdir, additional_arguments)
-    metrics.save_metrics(datadir, run_name, (time.time() - start), "runtimes") 
-    metrics.save_metrics(datadir, run_name, (time.time() - start), "seqtimes")
+    metrics.save_metrics(datadir, run_name, (time.time() - start), "runtimes")
+    #lb = fam.get_lb_from_run(output_dir)
+    metrics.save_metrics(datadir, run_name, (time.time() - start), "seqtimes") # *lb
   else:
     print("Skipping generax as no families are provided")
   #if (strategy == "EVAL"):

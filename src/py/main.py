@@ -3,12 +3,15 @@ import time
 import sys
 
 sys.path.insert(0, 'scripts')
-sys.path.insert(0, 'tools/data')
-import fam
-import metrics
 import launch_spearfish
 import launch_fastme
 import launch_generax
+import utils
+sys.path.insert(0, 'tools/data')
+import fam
+import metrics
+sys.path.insert(0, 'tools/msa')
+import dist_matrix_converter
 
 compute_string = ["NJ", "NJ", "FastME"]
 compute_string_short = ["nj", "nj", "fm"]
@@ -17,6 +20,7 @@ algo_string = ["APro", "MAD", "NoTag"]
 def run(datadir, subst_model, cores, compute, algo):
     algo = algo_string[algo]
     utils.printFlush(f"Run Spearfish with {compute_string[compute]}...\n****************************")
+    '''
     try:
         start = time.time()
         # ========= Step 1: Convert to valid input data =========
@@ -36,6 +40,7 @@ def run(datadir, subst_model, cores, compute, algo):
     except Exception as exc:
         utils.printFlush(f"Failed running Spearfish with {compute_string[compute]} (tag={algo})\n{exc}")
         return
+    '''
     # ========= Step 2: Pick best tree with GeneRax evaluation =========
     utils.printFlush("Picking best tree...\n**********")
     try:

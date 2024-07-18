@@ -52,7 +52,7 @@ generax_exec = os.path.join(programs_root, "GeneRax", "build", "bin", "generax")
 # FastME
 fastme_exec = os.path.join(programs_root, "FastME", "bin",  "fastme")
 # Spearfish
-ba_exec = os.path.join(root, "Spearfish", "build", "spearfish")
+spearfish_exec = os.path.join(root, "Spearfish", "build", "spearfish")
 # MPI
 mpischeduler_exec = os.path.join(programs_root, "MPIScheduler", "bin", "mpi-scheduler")
 # constants
