@@ -2,6 +2,11 @@
 // Created by knirschl on 02.07.24
 //
 
+/**
+ * Possibly modify corax/io/newick.cpp
+ */
+
+
 #ifndef SPEARFISH_CONVERT_H
 #define SPEARFISH_CONVERT_H
 
@@ -10,6 +15,7 @@
 #include <utility>
 #include <type_traits>
 #include <typeinfo>
+#include <stack>
 #include <string>
 #include "../misc/common_types.h"
 
