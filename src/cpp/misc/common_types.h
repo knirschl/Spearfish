@@ -6,6 +6,7 @@
 #define BA_COMMON_TYPES_H
 
 #include <vector>
+#include <numeric>
 
 template<typename T>
 using vector_t = std::vector<T>;

@@ -4,10 +4,11 @@
 
 #include <sstream>
 #include <iomanip>
-#include "io/parse_cli.h"
+
+#include "io/SpearfishArgumentParser.hpp"
 #include "io/parse_file.h"
 #include "io/write_file.h"
-#include "io/exec_cmd.h"
+#include "io/exec_cmd.hpp"
 #include "nj/tree.h"
 #include "nj/NJSimple.h"
 #include "nj/metadata.h"
@@ -108,20 +109,20 @@ dist_matrix_t correct_matrix(const double scale, const dist_matrix_t &species_tr
 int main(int argc, char *argv[]) {
     // --- parse ---
     // get cli inputs
-    auto cli_parser = build_parser("spearfish", "0.6");
-    parse(cli_parser, argc, argv);
+    SpearfishArgumentParser cli_parser{"spearfish", "0.6"};
+    cli_parser.parse(argc, argv);
 
     // read species tree
-    auto species_tree_pair = parse_phylip_mat_from_file<dist_t>(get_species_matrix(cli_parser));
+    auto species_tree_pair = parse_phylip_mat_from_file<dist_t>(cli_parser.get_species_matrix());
     auto species_tree_mat = species_tree_pair.first;
     auto species_tree_ids = species_tree_pair.second;
     int s_cnt{};
     for_each(species_tree_ids.begin(), species_tree_ids.end(),
              [&s_cnt](auto &s) { glob_mdata.groupname2matidx.emplace(s, s_cnt++); });
-    std::cout << "Checkpoint: Read S";
+    std::cout << "Checkpoint: Read S\n";
 
     // read alignment
-    auto alignment_pair = parse_phylip_mat_from_file<dist_t>(get_alignment_matrix(cli_parser));
+    auto alignment_pair = parse_phylip_mat_from_file<dist_t>(cli_parser.get_alignment_matrix());
     auto alignment_mat = alignment_pair.first;
     auto alignment_ids = alignment_pair.second;
     if (alignment_ids.size() < 4) {
@@ -134,25 +135,23 @@ int main(int argc, char *argv[]) {
              [&a_cnt, &starting_tree_mdata](auto &s) {
                  starting_tree_mdata.leafname2matidx.emplace(s, a_cnt++);
              });
-    std::cout << "Checkpoint: Read G";
-    // read mapping
-    auto map_config{get_mapping_config(cli_parser)};
-    std::string out_prefix{get_output_prefix(cli_parser)};
+    std::cout << "Checkpoint: Read G\n";
     // fill map
-    if (get<0>(map_config).empty()) {
+    if (cli_parser.has_mapping_config()) {
+        starting_tree_mdata.leafname2groupname = parse_mapping_from_cfg(cli_parser.get_mapping_config());
+    } else {
         // no mapping provided
         for (int i{}; i < alignment_ids.size(); i++) {
             starting_tree_mdata.leafname2groupname.emplace(alignment_ids[i], species_tree_ids[i]);
         }
-    } else {
-        starting_tree_mdata.leafname2groupname = parse_mapping_from_cfg(map_config);
     }
-    std::cout << "Checkpoint: Read M";
+    std::string out_prefix{cli_parser.get_output_prefix()};
+    std::cout << "Checkpoint: Read M\n";
     // --- pre-calculate ---
     // get starting tree
     std::shared_ptr<Tree> tree_tagged;
-    if (has_user_specified_tree(cli_parser)) {
-        tree_tagged = parse_newick_from_file(get_starting_tree(cli_parser), starting_tree_mdata);
+    if (cli_parser.has_starting_tree()) {
+        tree_tagged = parse_newick_from_file(cli_parser.get_starting_tree(), starting_tree_mdata);
         out_prefix.append("u");
     } else {
         tree_tagged = reset(alignment_ids, starting_tree_mdata);
@@ -167,9 +166,9 @@ int main(int argc, char *argv[]) {
         oss << std::setprecision(4) << std::noshowpoint << spec_mat_scale;
         out_prefix.append(oss.str());
     }
-    std::cout << "Checkpoint: Starting tree";
+    std::cout << "Checkpoint: Starting tree\n";
     //std::cout << "Start tree := " << tree_tagged->to_newick() << "\n" << tree_tagged->node_info() << "\n";
-    switch (get_algo(cli_parser)) {
+    switch (cli_parser.get_algo()) {
         case 0:
             tree_tagged->reroot_APro();
             out_prefix.append("a.");
@@ -199,20 +198,20 @@ int main(int argc, char *argv[]) {
             out_prefix.append("+.");
             break;
     }
-    std::cout << "Checkpoint: Marked";
+    std::cout << "Checkpoint: Marked\n";
     auto speciation_pairs{tree_tagged->get_speciation_pairs()};
     //std::cout << "Tagged tree := " << tree_tagged->to_newick() << "\n" << tree_tagged->node_info() << "\n";
 
     // --- calculate ---
     // NJ gene tree with corrected values
-    double scales[] = {
+    double scales[] = {1};
             /*0, 0.05, 0.1, 0.15, 0.2, 0.25, 0.3, 0.35, 0.4, 0.45, 0.5, 0.55, 0.6, 0.65, 0.7, 0.75,
             0.8, 0.85, 0.9, 0.95, 1.0, 1.05, 1.1, 1.15, 1.2, 1.25, 1.3, 1.35, 1.4, 1.45, 1.5, 1.55,
             1.6, 1.65, 1.7, 1.75, 1.8, 1.85, 1.9, 1.95, 2.0, 2.05, 2.1, 2.15, 2.2, 2.25, 2.3, 2.35,
             2.4, 2.45, 2.5, 2.55, 2.6, 2.65, 2.7, 2.75, 2.8, 2.9, 3.0, 3.1, 3.2, 3.3, 3.4, 3.5, 3.6,
             3.8, 4, 4.25, 4.5, 4.75, 5, 5.5, 6, 7, 8, 9, 10, 25, 50, 100*/
-            0, 0.05, 0.15, 0.25, 0.6, 1.15, 1.75, 2.35, 3.8, 8};
-    int c{get_c(cli_parser)};
+            //0, 0.05, 0.15, 0.25, 0.6, 1.15, 1.75, 2.35, 3.8, 8};
+    int c{cli_parser.get_c()};
 //#pragma omp parallel for default(shared)
     for (double scale: scales) {
         // correct with scaling
