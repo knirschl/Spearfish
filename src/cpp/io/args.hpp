@@ -1,18 +1,21 @@
-#ifndef SPEARFISH_SPEARFISH_ARGUMENT_PARSER_HPP
-#define SPEARFISH_SPEARFISH_ARGUMENT_PARSER_HPP
+#ifndef SPEARFISH_IO_ARGS_HPP
+#define SPEARFISH_IO_ARGS_HPP
 
 #include "/home/balin/Documents/Programming/libs/argparse/include/argparse/argparse.hpp"
 //#include "/home/fili/Documents/Programming/libs/argparse/include/argparse/argparse.hpp"
 //#include "/hits/basement/cme/knirsch/github/argparse/include/argparse/argparse.hpp"
 
-class SpearfishArgumentParser {
+class spearfish_argument_parser_t {
 private:
     argparse::ArgumentParser parser;
 
     void init();
 
 public:
-    SpearfishArgumentParser(const std::string& exec_name, const std::string& version);
+    spearfish_argument_parser_t(const std::string& exec_name, const std::string& version) :
+                                parser{exec_name, version} {
+                                    init();
+                                }
 
     bool parse(const int argc, char** argv);
 
@@ -35,4 +38,4 @@ public:
     std::tuple<std::string, bool, std::string> get_mapping_config();
 };
 
-#endif // SPEARFISH_SPEARFISH_ARGUMENT_PARSER_HPP
+#endif // SPEARFISH_IO_ARGS_PARSER_HPP

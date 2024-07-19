@@ -3,7 +3,7 @@
 #include <sstream>
 #include <string>
 
-#include "src/io/newick.hpp"
+#include "src/cpp/io/newick.hpp"
 
 /**
  * NEWICK LEXER

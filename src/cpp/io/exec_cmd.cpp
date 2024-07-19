@@ -4,6 +4,7 @@
 #include <stdexcept>
 #include <string>
 #include <array>
+
 #include "exec_cmd.hpp"
 
 int exec(const char *cmd, std::string &output) {
