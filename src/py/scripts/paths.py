@@ -35,8 +35,8 @@ else:
     programs_root = root
 
 # results
-output_root = os.path.join(root, "output")
-families_datasets_root = os.path.join(output_root, "families")
+output_root = os.path.join(root, "datasets")
+families_datasets_root = output_root #os.path.join(output_root, "families")
 
 # ---- EXTERNAL PROGRAMS ----
 # SimPhy

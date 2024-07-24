@@ -5,7 +5,7 @@
 #include <sstream>
 #include <iomanip>
 
-#include "io/SpearfishArgumentParser.hpp"
+#include "io/args.hpp"
 #include "io/parse_file.h"
 #include "io/write_file.h"
 #include "io/exec_cmd.hpp"
@@ -109,7 +109,7 @@ dist_matrix_t correct_matrix(const double scale, const dist_matrix_t &species_tr
 int main(int argc, char *argv[]) {
     // --- parse ---
     // get cli inputs
-    SpearfishArgumentParser cli_parser{"spearfish", "0.6"};
+    spearfish_argument_parser_t cli_parser{"spearfish", "0.6"};
     cli_parser.parse(argc, argv);
 
     // read species tree

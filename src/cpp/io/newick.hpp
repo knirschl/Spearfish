@@ -6,6 +6,7 @@
 #define SPEARFISH_IO_NEWICK_HPP
 
 #include <fstream>
+#include <utility>
 
 /**
  * Lexeme types for the newick parser.
@@ -35,7 +36,7 @@ public:
      *
      * @param input newick string
      */
-    spearfish_newick_lexer_t(std::string input) :
+    explicit spearfish_newick_lexer_t(std::string input) :
         _input{std::move(input)},
         _current_index{0} {};
 
@@ -136,7 +137,7 @@ private:
     std::string describe_token(spearfish_lexeme_t token_type);
 
     /* member variables */
-    std::string _input;
+    const std::string _input;
     std::string _value;
     size_t      _current_index;
 };
@@ -187,7 +188,7 @@ public:
      *
      * @param input Newick string to be parsed
      */
-     spearfish_newick_parser_t(std::string input) :
+     explicit spearfish_newick_parser_t(std::string input) :
         _lexer{std::move(input)},
         _leaf_count{0},
         _inner_count{0},
@@ -196,7 +197,7 @@ public:
     /**
      * Parse the newick tree which was passed to the constructor.
      */
-    void spearfish_newick_lexer_t::parse()
+    void parse()
     {
         parse_tree();
     }
@@ -254,7 +255,7 @@ private:
      *     <name> <length> <comment>
      * ```
      */
-    void parse_node_attrs(std::string& name, size_t& length);
+    void parse_node_attrs(std::string& name, double& length);
 
     /**
      * Function corresponding to the rule
@@ -285,7 +286,7 @@ private:
      *     <empty>
      * ```
      */
-    void parse_length(size_t& length);
+    void parse_length(double& length);
 
     /**
      * Function corresponding to the rule
@@ -316,7 +317,7 @@ private:
     double parse_number();
 
     /* member variables */
-    corax_newick_lexer_t _lexer;
+    spearfish_newick_lexer_t _lexer;
     size_t               _leaf_count;
     size_t               _inner_count;
     size_t               _edge_count;
@@ -332,12 +333,12 @@ private:
 /**
  * Wrapper function for spearfish_newick_parser_t::parse()
  */
-void tree_parse_newick_string(std::string newick_string)
+inline void tree_parse_newick_string(std::string newick_string)
 {
     try
     {
-        spearfish_newick_parser_t np{newick_string};
-        np.parse(auto_unroot, allow_rooted);
+        spearfish_newick_parser_t np{std::move(newick_string)};
+        np.parse();
     } catch (std::invalid_argument &e)
     {
         //corax_set_error(CORAX_ERROR_INVALID_TREE, e.what());
@@ -352,7 +353,7 @@ void tree_parse_newick_string(std::string newick_string)
 /**
  * Wrapper function for spearfish_newick_parser_t::parse()
  */
-void tree_parse_newick(const std::string filename)
+inline void tree_parse_newick(const std::string& filename)
 {
     std::ifstream newick_file{filename};
     std::string newick_string{(std::istreambuf_iterator<char>(newick_file)),

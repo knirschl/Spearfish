@@ -71,7 +71,9 @@ def list_or_int(arg):
 if (__name__ == "__main__"): 
     min_args_number = 4 # 3 + 1
     if (len(sys.argv) < min_args_number):
-        print("Syntax error: python " + os.path.basename(__file__) + "  dataset subst_model cores [compute=[0,1,2]] [algo=[0,1,2]] [\"test\"].\n  ")
+        print("Syntax error: python",
+              os.path.basename(__file__),
+              "dataset subst_model cores [compute=[0,1,2]] [algo=[0,1,2]] [\"test\"].\n")
         sys.exit(1)
   
     datadir = os.path.normpath(sys.argv[1])

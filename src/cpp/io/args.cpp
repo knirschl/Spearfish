@@ -1,6 +1,6 @@
 #include "args.hpp"
 
-void spearfish_argument_parser::init() {
+void spearfish_argument_parser_t::init() {
     // TODO description and epilog
     this->parser.add_description("");
     this->parser.add_epilog("");
@@ -48,7 +48,7 @@ void spearfish_argument_parser::init() {
             .help("mapping separator");
 }
 
-bool spearfish_argument_parser::parse(const int argc, char** argv) {
+bool spearfish_argument_parser_t::parse(const int argc, char** argv) {
     try {
         parser.parse_args(argc, argv);
     } catch (const std::exception& err) {
@@ -59,38 +59,38 @@ bool spearfish_argument_parser::parse(const int argc, char** argv) {
     return 0;
 }
 
-std::string spearfish_argument_parser::get_species_matrix() {
+std::string spearfish_argument_parser_t::get_species_matrix() {
     return this->parser.get("-s");
 }
 
-std::string spearfish_argument_parser::get_alignment_matrix() {
+std::string spearfish_argument_parser_t::get_alignment_matrix() {
     return this->parser.get("-a");
 }
 
-bool spearfish_argument_parser::has_starting_tree() {
+bool spearfish_argument_parser_t::has_starting_tree() {
     return this->parser.is_used("-t");
 }
 
-std::string spearfish_argument_parser::get_starting_tree() {
+std::string spearfish_argument_parser_t::get_starting_tree() {
     return this->parser.get("-t");
 }
 
-int spearfish_argument_parser::get_algo() {
+int spearfish_argument_parser_t::get_algo() {
     return this->parser.get<int>("-r");
 }
 
-int spearfish_argument_parser::get_c() {
+int spearfish_argument_parser_t::get_c() {
     return this->parser.get<int>("-c");
 }
 
-std::string spearfish_argument_parser::get_output_prefix() {
+std::string spearfish_argument_parser_t::get_output_prefix() {
     return this->parser.get("-p");
 }
 
-bool spearfish_argument_parser::has_mapping_config() {
+bool spearfish_argument_parser_t::has_mapping_config() {
     return this->parser.is_used("-m");
 }
 
-std::tuple<std::string, bool, std::string> spearfish_argument_parser::get_mapping_config() {
+std::tuple<std::string, bool, std::string> spearfish_argument_parser_t::get_mapping_config() {
     return {this->parser.get("-m"), this->parser.get<bool>("-l"), this->parser.get("-d")};
 }
