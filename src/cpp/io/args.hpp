@@ -17,7 +17,7 @@ public:
                                     init();
                                 }
 
-    bool parse(const int argc, char** argv);
+    bool parse(int argc, char** argv);
 
     std::string get_species_matrix();
     
