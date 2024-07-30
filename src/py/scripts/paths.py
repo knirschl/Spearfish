@@ -2,18 +2,14 @@
 
 import os
 
-
 def get_parent_path(path):
     return os.path.abspath(os.path.join(path, os.pardir))
-
 
 def python():
     return "python"
 
-
 def python3():
     return "python3"
-
 
 ## ---- DIRECTORIES ----
 # local
@@ -22,7 +18,6 @@ fili_root = "/home/fili/Documents/Programming/HITS"
 
 # github
 cluster_basement_root = "/hits/basement/cme/knirsch/github/"
-code_github_root = os.path.join(cluster_basement_root, "BA-Code")
 
 cwd = os.getcwd()
 if (cwd.startswith("/hits")):
@@ -39,8 +34,8 @@ else:
     programs_root = root
 
 # results
-output_root = os.path.join(root, "datasets")
-families_datasets_root = output_root  # os.path.join(output_root, "families")
+datasets_root = os.path.join(root, "datasets")
+families_datasets_root = os.path.join(datasets_root, "families")
 
 # ---- EXTERNAL PROGRAMS ----
 # SimPhy
