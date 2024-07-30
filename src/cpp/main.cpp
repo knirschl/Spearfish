@@ -107,6 +107,7 @@ dist_matrix_t correct_matrix(const double scale, const dist_matrix_t &species_tr
  * @return 0
  */
 int main(int argc, char *argv[]) {
+    std::cout << "Checkpoint: Start\n";
     // --- parse ---
     // get cli inputs
     spearfish_argument_parser_t cli_parser{"spearfish", "0.6"};
@@ -247,7 +248,7 @@ int main(int argc, char *argv[]) {
         }
         // TODO fix. prob because of the global maps -> prob fixed
         // compute NJ tree_tagged and output
-        std::shared_ptr<Tree> tree_corrected{reset(alignment_ids, tree_tagged->mdata)};
+        std::shared_ptr tree_corrected{reset(alignment_ids, tree_tagged->mdata)};
         neighborJoining(corrected_matrix, tree_corrected, tree_corrected->mdata.leaf_indices);
         //std::cout << "Neighbor-joined tree_tagged (" << scale_id << "): " << tree_tagged->to_newick() << '\n';
         success &= write_newick(*tree_corrected, out_prefix + scale_id.append(

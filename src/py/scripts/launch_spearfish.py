@@ -42,12 +42,7 @@ def generate_scheduler_commands_file(datadir, subst_model, species_tree, algo, m
             command.append("-m")
             command.append(fam.get_mappings(datadir, family))
             command.append("-r")
-            if (algo.lower() == "apro"):
-                command.append("0")
-            elif (algo.lower() == "mad"):
-                command.append("1")
-            else:
-                command.append("2")
+            command.append(str(algo))
             command.append("-c")
             command.append(str(mat_out))
             writer.write(" ".join(command) + "\n")
@@ -60,8 +55,7 @@ def extract_spearfish_trees(datadir, subst_model):
     invalid = 0
     for family in os.listdir(families_dir):
         for miscfile in os.listdir(fam.get_family_misc_dir(datadir, family)):
-            if (
-                    not (miscfile.startswith("spearfish." + subst_model) and miscfile.endswith(
+            if (not (miscfile.startswith("spearfish." + subst_model) and miscfile.endswith(
                         ".newick"))):
                 continue
             spearfishtree = os.path.join(fam.get_family_misc_dir(datadir, family), miscfile)

@@ -7,11 +7,9 @@ import launch_spearfish
 import launch_fastme
 import launch_generax
 import utils
-
 sys.path.insert(0, 'tools/data')
 import fam
 import metrics
-
 sys.path.insert(0, 'tools/msa')
 import dist_matrix_converter
 
@@ -20,11 +18,11 @@ compute_string_short = ["nj", "nj", "fm"]
 algo_string = ["APro", "MAD", "NoTag"]
 
 
-def run(datadir, subst_model, cores, compute, algo):
-    algo = algo_string[algo]
+def run(datadir, subst_model, cores, algo, compute):
+    algo_str = algo_string[algo]
+    compute_str = compute_string[compute]
     utils.printFlush(
-        f"Run Spearfish with {compute_string[compute]}...\n****************************")
-
+        f"Run Spearfish with {compute_str}...\n****************************")
     try:
         start = time.time()
         # ========= Step 1: Convert to valid input data =========
@@ -40,17 +38,16 @@ def run(datadir, subst_model, cores, compute, algo):
             launch_fastme.run_fastme_on_families_matrices(datadir, "spearfish.p", algo="B",
                                                           use_spr=True, cores=cores)
         elapsed = time.time() - start
-        print(f"Completed {compute_string[compute]} (tag={algo}). Elapsed time: {elapsed}s")
+        print(f"Completed {compute_str} (tag={algo_str}). Elapsed time: {elapsed}s")
         # print("=#=#= Took {}s per tree =#=#=".format(elapsed / ( int(
         # simphy.get_param_from_dataset_name("families", datadir)) * inferred_trees)))
         metrics.save_metrics(datadir,
-                             f"spearfish+{compute_string_short[compute]}+{algo.lower()}_trees",
+                             f"spearfish+{compute_string_short[compute]}+{algo_str.lower()}_trees",
                              elapsed, "runtimes")
     except Exception as exc:
         utils.printFlush(
-            f"Failed running Spearfish with {compute_string[compute]} (tag={algo})\n{exc}")
+            f"Failed running Spearfish with {compute_str} (tag={algo_str})\n{exc}")
         return
-
     # ========= Step 2: Pick best tree with GeneRax evaluation =========
     utils.printFlush("Picking best tree...\n**********")
     try:
@@ -62,27 +59,28 @@ def run(datadir, subst_model, cores, compute, algo):
         elapsed = elapsed2 - elapsed
         print(f"Completed pick. Elapsed time: {elapsed}s")
         print(
-            f"End of Spearfish with {compute_string[compute]} (tga={algo})). Elapsed time: {elapsed2}s")
+            f"End of Spearfish with {compute_str} (tag={algo_str})). Elapsed time: {elapsed2}s")
         metrics.save_metrics(datadir,
-                             f"spearfish+{compute_string_short[compute]}+{algo.lower()}_pick",
+                             f"spearfish+{compute_string_short[compute]}+{algo_str.lower()}_pick",
                              elapsed, "runtimes")
         metrics.save_metrics(datadir,
-                             f"spearfish+{compute_string_short[compute]}+{algo.lower()}_full",
+                             f"spearfish+{compute_str}+{algo_str.lower()}_full",
                              elapsed2, "runtimes")
     except Exception as exc:
         utils.printFlush("Failed running pick\n" + str(exc))
 
 
-def test(datadir, subst_model, cores, computes=[0, 1, 2], algos=[0, 1, 2]):
-    for compute in computes:
-        for algo in algos:
+def test(datadir, subst_model, cores):
+    print("testing")
+    for compute in [0, 2]:
+        for algo in [0, 1, 2]:
             run(datadir, cores, subst_model, algo, compute)
 
 
 def list_or_int(arg):
     arg = arg.split("=")[1]
     if arg.endswith("]"):
-        return list(arg)
+        return [int(a) for a in arg[1:-1].split(",")]
     else:
         return int(arg)
 
@@ -92,7 +90,7 @@ if (__name__ == "__main__"):
     if (len(sys.argv) < min_args_number):
         print("Syntax error: python",
               os.path.basename(__file__),
-              "dataset subst_model cores [compute=[0,1,2]] [algo=[0,1,2]] [\"test\"].\n")
+              "dataset subst_model cores [compute=[0,1,2]] [algo=[0,1,2] [test].\n")
         sys.exit(1)
 
     datadir = os.path.normpath(sys.argv[1])
@@ -104,25 +102,18 @@ if (__name__ == "__main__"):
     algo = -1
     run_test = False
     for arg in additional_arguments:
-        if arg.startswith("compute="):
-            compute = list_or_int(arg)
-        elif arg.startswith("algo="):
-            algo = list_or_int(arg)
-        elif arg == "test":
+        if arg == "test":
             run_test = True
+            break
+        elif arg.startswith("compute="):
+            compute = int(arg)
+        elif arg.startswith("algo="):
+            algo = int(arg)
     if run_test:
-        if (compute != -1):
-            if (algo != -1):
-                test(datadir, subst_model, cores, computes=compute, algos=algo)
-            else:
-                test(datadir, subst_model, cores, computes=compute)
-        elif (algo != -1):
-            test(datadir, subst_model, cores, algos=algo)
-        else:
-            test(datadir, subst_model, cores)
+        test(datadir, subst_model, cores)
     else:
         if (compute == -1):
             compute = 2  # FM
         elif (algo == -1):
             algo = 2  # NoTag
-        run(datadir, subst_model, cores, compute, algo)
+        run(datadir, subst_model, cores, algo, compute)

@@ -54,9 +54,9 @@ bool spearfish_argument_parser_t::parse(const int argc, char** argv) {
     } catch (const std::exception& err) {
         std::cerr << err.what() << std::endl;
         std::cerr << this->parser;
-        return 1;
+        return false;
     }
-    return 0;
+    return true;
 }
 
 std::string spearfish_argument_parser_t::get_species_matrix() {

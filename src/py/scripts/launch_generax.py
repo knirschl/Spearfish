@@ -214,7 +214,7 @@ def eval_sumLogL(results_dir, family):
         print("Empty stats:", results_dir, family)
         return float("-inf")
     logls = lines[0].split()
-    print(family, logls)
+    #print(family, logls)
     return (float)(logls[0]) + (float)(logls[1])
 
 
