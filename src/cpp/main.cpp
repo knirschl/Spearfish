@@ -17,8 +17,8 @@ static const std::string CORRECTION_IDENT{"S~G"};
 static const std::string MATRX_PHY_FILE{".matrix.phy"};
 static const std::string GTREE_NWK_FILE{".geneTree.newick"};
 static const std::string START_TREE_NWK_FILE{".startGeneTree.newick"};
-static const std::string MADROOT_BIN{//"/hits/basement/cme/knirsch/github/"
-                                     "/home/balin/Documents/Programming/HITS/Bioinformatics/"
+static const std::string MADROOT_BIN{"/hits/basement/cme/knirsch/github/"
+                                     //"/home/balin/Documents/Programming/HITS/Bioinformatics/"
                                      "MADroot/bin/madRoot-fix"};
 static const std::string STD_OUT_ERR_MOD{" 2>&1"};
 
