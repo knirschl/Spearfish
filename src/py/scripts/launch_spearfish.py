@@ -2,6 +2,7 @@ import os
 import shutil
 import sys
 import time
+
 sys.path.insert(0, 'scripts')
 sys.path.insert(0, os.path.join("tools", "data"))
 sys.path.insert(0, 'tools/msa')
@@ -10,6 +11,7 @@ import utils
 import fam
 import metrics
 import analyze_msa
+
 
 def generate_scheduler_commands_file(datadir, subst_model, species_tree, algo, mat_out, output_dir):
     results_dir = os.path.join(output_dir, "results")
@@ -40,16 +42,12 @@ def generate_scheduler_commands_file(datadir, subst_model, species_tree, algo, m
             command.append("-m")
             command.append(fam.get_mappings(datadir, family))
             command.append("-r")
-            if (algo.lower() == "apro"):
-                command.append("0")
-            elif (algo.lower() == "mad"):
-                command.append("1")
-            else:
-                command.append("2")
+            command.append(str(algo))
             command.append("-c")
             command.append(str(mat_out))
             writer.write(" ".join(command) + "\n")
     return scheduler_commands_file
+
 
 def extract_spearfish_trees(datadir, subst_model):
     families_dir = os.path.join(datadir, "families")
@@ -57,7 +55,8 @@ def extract_spearfish_trees(datadir, subst_model):
     invalid = 0
     for family in os.listdir(families_dir):
         for miscfile in os.listdir(fam.get_family_misc_dir(datadir, family)):
-            if (not (miscfile.startswith("spearfish." + subst_model) and miscfile.endswith(".newick"))):
+            if (not (miscfile.startswith("spearfish." + subst_model) and miscfile.endswith(
+                        ".newick"))):
                 continue
             spearfishtree = os.path.join(fam.get_family_misc_dir(datadir, family), miscfile)
             tree = os.path.join(fam.get_gene_tree_dir(datadir, family), miscfile)
@@ -70,7 +69,7 @@ def extract_spearfish_trees(datadir, subst_model):
                     os.remove(tree)
                 except:
                     pass
-            os.remove(spearfishtree) 
+            os.remove(spearfishtree)
     print("Extracted " + str(valid) + " trees")
     if (invalid > 0):
         print("WARNING! " + str(invalid) + " trees were skipped")
@@ -83,12 +82,16 @@ def run_spearfish_on_families(datadir, subst_model, species_tree, algo, mat_out,
     shutil.rmtree(output_dir, True)
     os.makedirs(output_dir)
     # run
-    scheduler_commands_file = generate_scheduler_commands_file(datadir, subst_model, species_tree, algo, mat_out, output_dir)
+    scheduler_commands_file = generate_scheduler_commands_file(datadir, subst_model, species_tree,
+                                                               algo, mat_out, output_dir)
     start = time.time()
-    utils.run_with_scheduler(paths.spearfish_exec, scheduler_commands_file, "fork", cores, output_dir, "logs.txt")
+    utils.run_with_scheduler(paths.spearfish_exec, scheduler_commands_file,
+                             paths.mpi_scheduler_heuristic, cores, output_dir, "logs.txt")
     # metrics
-    metrics.save_metrics(datadir, fam.get_run_name("spearfish", subst_model), (time.time() - start), "runtimes") 
+    metrics.save_metrics(datadir, fam.get_run_name("spearfish", subst_model), (time.time() - start),
+                         "runtimes")
     lb = fam.get_lb_from_run(output_dir)
-    metrics.save_metrics(datadir, fam.get_run_name("spearfish", subst_model), (time.time() - start) * lb, "seqtimes")
+    metrics.save_metrics(datadir, fam.get_run_name("spearfish", subst_model),
+                         (time.time() - start) * lb, "seqtimes")
     if (mat_out < 2):
         return extract_spearfish_trees(datadir, subst_model)

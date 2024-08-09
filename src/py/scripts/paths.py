@@ -11,14 +11,13 @@ def python():
 def python3():
     return "python3"
 
-## ---- DIRECTORIES ---- 
+## ---- DIRECTORIES ----
 # local
 balin_root = "/home/balin/Documents/Programming/HITS"
 fili_root = "/home/fili/Documents/Programming/HITS"
 
 # github
 cluster_basement_root = "/hits/basement/cme/knirsch/github/"
-code_github_root = os.path.join(cluster_basement_root, "BA-Code")
 
 cwd = os.getcwd()
 if (cwd.startswith("/hits")):
@@ -35,8 +34,8 @@ else:
     programs_root = root
 
 # results
-output_root = os.path.join(root, "output")
-families_datasets_root = os.path.join(output_root, "families")
+datasets_root = os.path.join(root, "datasets")
+families_datasets_root = os.path.join(datasets_root, "families")
 
 # ---- EXTERNAL PROGRAMS ----
 # SimPhy
@@ -50,11 +49,11 @@ raxml_mpi_exec = os.path.join(raxml_root, "bin", "raxml-ng-mpi")
 # GeneRax
 generax_exec = os.path.join(programs_root, "GeneRax", "build", "bin", "generax")
 # FastME
-fastme_exec = os.path.join(programs_root, "FastME", "bin",  "fastme")
+fastme_exec = os.path.join(programs_root, "FastME", "bin", "fastme")
 # Spearfish
 spearfish_exec = os.path.join(root, "Spearfish", "build", "spearfish")
 # MPI
 mpischeduler_exec = os.path.join(programs_root, "MPIScheduler", "bin", "mpi-scheduler")
 # constants
-mpi_scheduler_heuristic = "--split-scheduler"
+mpi_scheduler_heuristic = "fork"  # "split"
 historic = os.path.join(root, "historic.txt")

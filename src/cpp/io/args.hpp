@@ -1,9 +1,9 @@
 #ifndef SPEARFISH_IO_ARGS_HPP
 #define SPEARFISH_IO_ARGS_HPP
 
-#include "/home/balin/Documents/Programming/libs/argparse/include/argparse/argparse.hpp"
+//#include "/home/balin/Documents/Programming/libs/argparse/include/argparse/argparse.hpp"
 //#include "/home/fili/Documents/Programming/libs/argparse/include/argparse/argparse.hpp"
-//#include "/hits/basement/cme/knirsch/github/argparse/include/argparse/argparse.hpp"
+#include "/hits/basement/cme/knirsch/github/argparse/include/argparse/argparse.hpp"
 
 class spearfish_argument_parser_t {
 private:
@@ -17,7 +17,7 @@ public:
                                     init();
                                 }
 
-    bool parse(const int argc, char** argv);
+    bool parse(int argc, char** argv);
 
     std::string get_species_matrix();
     

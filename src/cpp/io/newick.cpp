@@ -3,7 +3,7 @@
 #include <sstream>
 #include <string>
 
-#include "src/cpp/io/newick.hpp"
+#include "newick.hpp"
 
 /**
  * NEWICK LEXER
@@ -217,14 +217,15 @@ void spearfish_newick_parser_t::parse_internal()
     
     _lexer.expect(CLOSING_PARENTHESIS);
     
-    auto length;
-    parse_node_attrs(length);
+    std::string name;
+    double length;
+    parse_node_attrs(name, length); // TODO dont need name?
     /* TODO
     matrix.add(length, start_leaf, _leaf_count);
     _r.add(length, start_leaf, _leaf_count);
     */
     
-    _inner_count++:
+    _inner_count++;
 }
 
 void spearfish_newick_parser_t::parse_node_set()
@@ -237,7 +238,7 @@ void spearfish_newick_parser_t::parse_node_set()
     }
 }
 
-void spearfish_newick_parser_t::parse_node_attrs(std::string& name, size_t& length)
+void spearfish_newick_parser_t::parse_node_attrs(std::string& name, double& length)
 {
     parse_name(name);
     parse_comment();
@@ -248,7 +249,7 @@ void spearfish_newick_parser_t::parse_node_attrs(std::string& name, size_t& leng
 void spearfish_newick_parser_t::parse_leaf()
 {
     std::string name;
-    size_t length;
+    double length;
     parse_node_attrs(name, length);
     if (name.empty()) // TODO correct check (nullptr/empty/...)
     {
@@ -274,9 +275,9 @@ void spearfish_newick_parser_t::parse_name(std::string& name)
     }
 }
 
-void spearfish_newick_parser_t::parse_length(size_t& length)
+void spearfish_newick_parser_t::parse_length(double& length)
 {
-    if (_lexer.peak == COLON)
+    if (_lexer.peak() == COLON)
     {
         _lexer.consume();
         _lexer.expect(VALUE);
