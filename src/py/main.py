@@ -17,7 +17,7 @@ compute_string = ["NJ", "NJ", "FastME"]
 compute_string_short = ["nj", "nj", "fm"]
 algo_string = ["APro", "MAD", "NoTag"]
 
-def run(datadir, subst_model, cores, compute, algo):
+def run(datadir, subst_model, is_dna, cores, compute, algo):
     algo = algo_string[algo]
     utils.printFlush(f"Run Spearfish with {compute_string[compute]}...\n****************************")
     
@@ -25,14 +25,14 @@ def run(datadir, subst_model, cores, compute, algo):
         start = time.time()
         # ========= Step 1: Convert to valid input data =========
         # Convert species tree and alignments to distance matrix
-        dist_matrix_converter.convert_input(datadir, cores)
+        dist_matrix_converter.convert_input(datadir, subst_model, is_dna, cores)
         species_tree = fam.get_true_species_tree_matrix(datadir)
         # ========= Step 2: Infer trees =========
         # Combine Matrix and compute trees
-        inferred_trees = launch_spearfish.run_spearfish_on_families(datadir, "p", species_tree, 
+        inferred_trees = launch_spearfish.run_spearfish_on_families(datadir, subst_model, species_tree, 
                             algo=algo, mat_out=compute, cores=cores)
         if (compute == 2):
-            launch_fastme.run_fastme_on_families_matrices(datadir, "spearfish.p", algo="B", use_spr=True, cores=cores)
+            launch_fastme.run_fastme_on_families_matrices(datadir, "spearfish." + subst_model, algo="B", use_spr=True, cores=cores)
         elapsed = time.time() - start
         print(f"Completed {compute_string[compute]} (tag={algo}). Elapsed time: {elapsed}s")
         #print("=#=#= Took {}s per tree =#=#=".format(elapsed / ((int)(simphy.get_param_from_dataset_name("families", datadir)) * inferred_trees)))
@@ -56,10 +56,10 @@ def run(datadir, subst_model, cores, compute, algo):
     except Exception as exc:
         utils.printFlush("Failed running pick\n" + str(exc))
 
-def test(datadir, subst_model, cores, computes=[0, 1, 2], algos=[0, 1, 2]):
+def test(datadir, subst_model, is_dna, cores, computes=[0, 1, 2], algos=[0, 1, 2]):
     for compute in computes:
         for algo in algos:
-            run(datadir, cores, subst_model, algo, compute)
+            run(datadir, cores, subst_model, is_dna, algo, compute)
 
 def list_or_int(arg):
     arg = arg.split("=")[1]
@@ -69,14 +69,15 @@ def list_or_int(arg):
         return int(arg)
 
 if (__name__ == "__main__"): 
-    min_args_number = 4 # 3 + 1
+    min_args_number = 5 # 4 + 1
     if (len(sys.argv) < min_args_number):
-        print("Syntax error: python " + os.path.basename(__file__) + "  dataset subst_model cores [compute=[0,1,2]] [algo=[0,1,2]] [\"test\"].\n  ")
+        print("Syntax error: python " + os.path.basename(__file__) + "  dataset subst_model dna cores [compute=[0,1,2]] [algo=[0,1,2]] [\"test\"].\n  ")
         sys.exit(1)
   
     datadir = os.path.normpath(sys.argv[1])
     subst_model = sys.argv[2]
-    cores = int(sys.argv[3])
+    is_dna = bool(sys.argv[3])
+    cores = int(sys.argv[4])
     additional_arguments = sys.argv[min_args_number:]
     # c++ run parameters
     compute = -1
@@ -92,16 +93,16 @@ if (__name__ == "__main__"):
     if test:
         if (compute != -1):
             if (algo != -1):
-                test(datadir, subst_model, cores, computes=compute, algos=algo)
+                test(datadir, subst_model, is_dna, cores, computes=compute, algos=algo)
             else:
-                test(datadir, subst_model, cores, computes=compute)
+                test(datadir, subst_model, is_dna, cores, computes=compute)
         elif (algo != -1):
-            test(datadir, subst_model, cores, algos=algo)
+            test(datadir, subst_model, is_dna, cores, algos=algo)
         else:
-            test(datadir, subst_model, cores)
+            test(datadir, subst_model, is_dna, cores)
     else:
         if (compute == -1):
             compute = 2 # FM
         elif (algo == -1):
             algo = 2 # NoTag
-        run(datadir, subst_model, cores, compute, algo)
+        run(datadir, subst_model, is_dna, cores, compute, algo)

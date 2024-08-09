@@ -73,9 +73,9 @@ def write_phylip(dist_matrix, labels, handle):
         handle.write(row_fmt.format(*fields))
 
 
-def convert_input(datadir, cores):
+def convert_input(datadir, subst_model, is_dna, cores):
     # TODO only if doesn't already exist
     # species tree
     from_newick(fam.get_true_species_tree(datadir))
     # gene alignments
-    launch_fastme.run_fastme_matrix(datadir, cores=cores)
+    launch_fastme.run_fastme_matrix(datadir, subst_model, is_dna, cores=cores)
