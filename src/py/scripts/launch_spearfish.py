@@ -76,7 +76,7 @@ def extract_spearfish_trees(datadir, subst_model):
     return valid
 
 
-def run_spearfish_on_families(datadir, subst_model, species_tree, algo, mat_out, cores):
+def run_spearfish_on_families(datadir, subst_model, is_dna, species_tree, algo, mat_out, cores):
     # output dir
     output_dir = fam.get_run_dir(datadir, subst_model, "spearfish_run")
     shutil.rmtree(output_dir, True)
