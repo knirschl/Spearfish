@@ -19,6 +19,7 @@ algo_string = ["APro", "MAD", "NoTag"]
 
 
 def run(datadir, subst_model, is_dna, cores, algo, compute):
+    fm_subst_model, generax_subst_model = subst_model.split("/")
     algo_str = algo_string[algo]
     compute_str = compute_string[compute]
     utils.printFlush(
@@ -31,11 +32,11 @@ def run(datadir, subst_model, is_dna, cores, algo, compute):
         species_tree = fam.get_true_species_tree_matrix(datadir)
         # ========= Step 2: Infer trees =========
         # Combine Matrix and compute trees
-        inferred_trees = launch_spearfish.run_spearfish_on_families(datadir, subst_model, is_dna, species_tree,
+        inferred_trees = launch_spearfish.run_spearfish_on_families(datadir, fm_subst_model, is_dna, species_tree,
                                                                     algo=algo, mat_out=compute,
                                                                     cores=cores)
         if (compute == 2):
-            launch_fastme.run_fastme_on_families_matrices(datadir, "spearfish." + subst_model, algo="B",
+            launch_fastme.run_fastme_on_families_matrices(datadir, "spearfish." + fm_subst_model, algo="B",
                                                           use_spr=True, cores=cores)
         elapsed = time.time() - start
         print(f"Completed {compute_str} (tag={algo_str}). Elapsed time: {elapsed}s")
@@ -52,8 +53,8 @@ def run(datadir, subst_model, is_dna, cores, algo, compute):
     utils.printFlush("Picking best tree...\n**********")
     try:
         species_tree = fam.get_species_tree(datadir)
-        resultsdir = fam.get_run_dir(datadir, subst_model, "generax_eval_run")
-        launch_generax.run(datadir, subst_model, "EVAL", species_tree, "spearfish", cores,
+        resultsdir = fam.get_run_dir(datadir, generax_subst_model, "generax_eval_run")
+        launch_generax.run(datadir, generax_subst_model, "EVAL", species_tree, "spearfish", cores,
                            ["--rec-model", "UndatedDL", "--per-family-rates"], resultsdir, False)
         elapsed2 = time.time() - start
         elapsed = elapsed2 - elapsed
