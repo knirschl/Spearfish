@@ -28,7 +28,7 @@ def run(datadir, subst_model, is_dna, cores, algo, compute):
         start = time.time()
         # ========= Step 1: Convert to valid input data =========
         # Convert species tree and alignments to distance matrix
-        dist_matrix_converter.convert_input(datadir, subst_model, is_dna, cores)
+        dist_matrix_converter.convert_input(datadir, fm_subst_model, is_dna, cores)
         species_tree = fam.get_true_species_tree_matrix(datadir)
         # ========= Step 2: Infer trees =========
         # Combine Matrix and compute trees
