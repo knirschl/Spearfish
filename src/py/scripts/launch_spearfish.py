@@ -13,7 +13,7 @@ import metrics
 import analyze_msa
 
 
-def generate_scheduler_commands_file(datadir, subst_model, species_tree, algo, mat_out, output_dir):
+def generate_scheduler_commands_file(datadir, subst_model, species_matrix, algo, mat_out, output_dir):
     results_dir = os.path.join(output_dir, "results")
     scheduler_commands_file = os.path.join(output_dir, "commands.txt")
     with open(scheduler_commands_file, "w") as writer:
@@ -34,7 +34,7 @@ def generate_scheduler_commands_file(datadir, subst_model, species_tree, algo, m
             command.append("1")
             command.append("1")
             command.append("-s")
-            command.append(species_tree)
+            command.append(species_matrix)
             command.append("-a")
             command.append(alignment_matrix)
             command.append("-p")
@@ -76,13 +76,13 @@ def extract_spearfish_trees(datadir, subst_model):
     return valid
 
 
-def run_spearfish_on_families(datadir, subst_model, is_dna, species_tree, algo, mat_out, cores):
+def run_spearfish_on_families(datadir, subst_model, is_dna, species_matrix, algo, mat_out, cores):
     # output dir
     output_dir = fam.get_run_dir(datadir, subst_model, "spearfish_run")
     shutil.rmtree(output_dir, True)
     os.makedirs(output_dir)
     # run
-    scheduler_commands_file = generate_scheduler_commands_file(datadir, subst_model, species_tree,
+    scheduler_commands_file = generate_scheduler_commands_file(datadir, subst_model, species_matrix,
                                                                algo, mat_out, output_dir)
     start = time.time()
     utils.run_with_scheduler(paths.spearfish_exec, scheduler_commands_file,

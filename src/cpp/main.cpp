@@ -157,12 +157,14 @@ int main(int argc, char *argv[]) {
     } else {
         tree_tagged = reset(alignment_ids, starting_tree_mdata);
         //std::cout << "S := " << mat_to_string(species_tree_mat) << "\nG := " << mat_to_string(alignment_mat) << "\n";
-        double spec_mat_scale{0.0}; // TODO change to 2.4
-        dist_matrix_t start_mat{correct_matrix(spec_mat_scale, species_tree_mat, alignment_mat,
-                                               tree_tagged->mdata)};
-        //std::cout << "C := " << mat_to_string(start_mat) << "\n";
-        // NJ gene tree with only alignment matrix (0S+G)
-        neighborJoining<>(start_mat, tree_tagged, tree_tagged->mdata.leaf_indices);
+        double spec_mat_scale{0.0}; // TODO change?
+        if (cli_parser.get_algo() != 2) {
+            dist_matrix_t start_mat{correct_matrix(spec_mat_scale, species_tree_mat, alignment_mat,
+                                                   tree_tagged->mdata)};
+            //std::cout << "C := " << mat_to_string(start_mat) << "\n";
+            // NJ gene tree with only alignment matrix (0S+G)
+            neighborJoining<>(start_mat, tree_tagged, tree_tagged->mdata.leaf_indices);
+        }
         std::ostringstream oss;
         oss << std::setprecision(4) << std::noshowpoint << spec_mat_scale;
         out_prefix.append(oss.str());
@@ -200,8 +202,7 @@ int main(int argc, char *argv[]) {
             break;
     }
     std::cout << "Checkpoint: Marked\n";
-    auto speciation_pairs{tree_tagged->get_speciation_pairs()};
-    //std::cout << "Tagged tree := " << tree_tagged->to_newick() << "\n" << tree_tagged->node_info() << "\n";
+    auto speciation_pairs{tree_tagged->get_speciation_pairs()};    
 
     // --- calculate ---
     // NJ gene tree with corrected values

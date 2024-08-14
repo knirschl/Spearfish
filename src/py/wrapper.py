@@ -29,10 +29,10 @@ def run(datadir, subst_model, is_dna, cores, algo, compute):
         # ========= Step 1: Convert to valid input data =========
         # Convert species tree and alignments to distance matrix
         dist_matrix_converter.convert_input(datadir, fm_subst_model, is_dna, cores)
-        species_tree = fam.get_true_species_tree_matrix(datadir)
+        species_matrix = fam.get_true_species_tree_matrix(datadir)
         # ========= Step 2: Infer trees =========
         # Combine Matrix and compute trees
-        inferred_trees = launch_spearfish.run_spearfish_on_families(datadir, fm_subst_model, is_dna, species_tree,
+        inferred_trees = launch_spearfish.run_spearfish_on_families(datadir, fm_subst_model, is_dna, species_matrix,
                                                                     algo=algo, mat_out=compute,
                                                                     cores=cores)
         if (compute == 2):
