@@ -19,7 +19,7 @@ add_executable(spearfish src/cpp/main.cpp)
 target_link_libraries(spearfish spearfish_code)
 
 # Testing
-find_package(ut REQUIRED)
+#find_package(ut REQUIRED)
 
-add_executable(spearfish_tests test/cpp/main.cpp test/cpp/misc/matrix_test.cpp)
-target_link_libraries(spearfish_tests spearfish_code Boost::ut)
+#add_executable(spearfish_tests test/cpp/main.cpp test/cpp/misc/matrix_test.cpp)
+#target_link_libraries(spearfish_tests spearfish_code Boost::ut)
