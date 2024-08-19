@@ -15,17 +15,22 @@ import analyze_msa
 import msa_converter
 
 
+dna_model = {"p": "p", "RYs": "Y", "RY": "R", "JC69": "J", "K2P": "K",
+             "F81": "1", "F84": "4", "TN93": "T", "LogDet": "L"}
+protein_model = {"p": "p", "F81": "F", "LG": "L", "WAG": "W", "JTT": "J",
+                 "Dayhoff": "h", "DCMut": "D", "CpRev": "C", "MtREV": "M",
+                 "RtREV": "R", "HIVb": "b", "HIVw": "I", "FLU": "U"}
+
+
 def generate_scheduler_commands_file(datadir, subst_model, is_dna, algo, use_spr, only_mat,
                                      output_dir):
     results_dir = os.path.join(output_dir, "results")
     scheduler_commands_file = os.path.join(output_dir, "commands.txt")
     gamma = False
     sp = subst_model.split("+")
-    fastme_model = subst_model
     if (len(sp) > 1 and sp[1] == "G"):
-        fastme_model = sp[0]
         gamma = True
-    fastme_model.removeprefix('F8')
+    fastme_model = [protein_model, dna_model][is_dna][sp[0]]
     with open(scheduler_commands_file, "w") as writer:
         for family in fam.get_families_list(datadir):
             if (not analyze_msa.has_distinct_seqs(
@@ -57,7 +62,7 @@ def generate_scheduler_commands_file(datadir, subst_model, is_dna, algo, use_spr
             else:
                 command.append("-p" + fastme_model)
             if (gamma):
-                command.append("1.0")
+                command.append("-g") # + alpha
             # output tree & matrix
             command.append("-o")
             command.append(fastme_output)
