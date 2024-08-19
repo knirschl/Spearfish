@@ -19,7 +19,13 @@ algo_string = ["APro", "MAD", "NoTag"]
 
 
 def run(datadir, subst_model, is_dna, cores, algo, compute):
-    fm_subst_model, generax_subst_model = subst_model.split("/")
+    # For testing purposes, subst_model should be same later
+    sp = subst_model.split("/")
+    fm_subst_model = sp[0]
+    if (len(sp) == 2):
+        generax_subst_model = sp[1]
+    else:
+        generax_subst_model = fm_subst_model
     algo_str = algo_string[algo]
     compute_str = compute_string[compute]
     utils.printFlush(
@@ -96,7 +102,7 @@ if (__name__ == "__main__"):
 
     datadir = os.path.normpath(sys.argv[1])
     subst_model = sys.argv[2]
-    is_dna = bool(sys.argv[3])
+    is_dna = bool(int(sys.argv[3])) # Cast to int is important!!!
     cores = int(sys.argv[4])
     additional_arguments = sys.argv[min_args_number:]
     # c++ run parameters
