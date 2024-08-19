@@ -59,7 +59,8 @@ std::pair<matrix_t<T>, vector_t<std::string>> parse_phylip(std::ifstream &reader
         // match regex
         if (std::regex_match(line, results, line_regex)) {
             ids[outer_counter] = results[1]; // first group := id
-            line.erase(line.begin(), line.begin() + 10); // remove id
+            // Accept any id length (not strict phylip)
+            line.erase(line.begin(), line.begin() + results[1].length()); // remove id
             while (std::regex_search(line, results, whitespace_mat_element_regex)) {
                 for (int i{1}; i < results.size(); i++) {
                     if (results[i].matched) {
