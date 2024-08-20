@@ -55,7 +55,7 @@ def run(datadir, subst_model, is_dna, cores, algo, compute):
         utils.printFlush(
             f"Failed running Spearfish with {compute_str} (tag={algo_str})\n{exc}")
         return
-    # ========= Step 2: Pick best tree with GeneRax evaluation =========
+    # ========= Step 3: Pick best tree with GeneRax evaluation =========
     utils.printFlush("Picking best tree...\n**********")
     try:
         species_tree = fam.get_species_tree(datadir)
@@ -79,6 +79,7 @@ def run(datadir, subst_model, is_dna, cores, algo, compute):
 
 def test(datadir, subst_model, is_dna, cores):
     print("testing")
+    #run(datadir, subst_model, is_dna, cores, 2, 2)
     for compute in [0, 2]:
         for algo in [0, 1, 2]:
             run(datadir, subst_model, is_dna, cores, algo, compute)

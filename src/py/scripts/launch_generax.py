@@ -109,8 +109,8 @@ def build_generax_families_file_eval(datadir, subst_model, output, tree_prefix="
                 writer.write("alignment = " + alignment + "\n")
                 writer.write("mapping = " + mapping + "\n")
                 writer.write("subst_model = " + raxml_model + "\n")
-        print("~~~~ Skipped", skip, "trees from getting evaluated ~~~~")
-        return empty
+    print("~~~~ Skipped", skip, "trees from getting evaluated ~~~~")
+    return empty
 
 
 def get_generax_command(generax_families_file, species_tree, strategy, rec_model,
