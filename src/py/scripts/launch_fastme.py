@@ -218,7 +218,7 @@ def run_fastme_matrix(datadir, subst_model="p", is_dna=True, cores=1):
 
 def run_fastme_on_families_matrices(datadir, mat_prefix, algo, use_spr, cores):
     fastme_name = "fastme." + mat_prefix[:-1]
-    subst_model = mat_prefix.replace("ba", "").replace(".", "")
+    subst_model = mat_prefix.replace("spearfish", "").replace(".", "")
     output_dir = fam.get_run_dir(datadir, subst_model, fastme_name + "_run")
     shutil.rmtree(output_dir, True)
     os.makedirs(output_dir)

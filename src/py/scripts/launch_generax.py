@@ -237,8 +237,11 @@ def eval_and_pick(datadir, results_dir):
             best_tree[true_family][idx] = tree
             best_logL[true_family][idx] = logL
         elif (logL == best_logL[true_family][idx]):
-            continue
-            # TODO if same: which one?
+            # if same, select lower scale
+            scale_best = float(re.search(r'(\d+(?:\.\d+)?)S~G', best_tree[true_family][idx])[1])
+            scale_this = float(re.search(r'(\d+(?:\.\d+)?)S~G', tree)[1])
+            if scale_this < scale_best:
+                best_tree[true_family][idx] = tree
     with open(os.path.join(fam.get_metrics_dir(datadir), "generax_picks.txt"), "w") as writer:
         for family in best_tree:
             # pick = best_tree[family]
