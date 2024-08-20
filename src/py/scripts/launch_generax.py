@@ -93,22 +93,26 @@ def build_generax_families_file_eval(datadir, subst_model, output, tree_prefix="
             for tree in fam.get_gene_tree_list(datadir, family):
                 if (not tree.startswith(tree_prefix)):
                     continue
-                scale = float(re.search(r'(\d+(?:\.\d+)?)S~G', tree)[1])
+                if ("startTree" in tree):
+                    continue
+                #scale = float(re.search(r'(\d+(?:\.\d+)?)S~G', tree)[1])
                 # if (scale < 1 or scale > 4.5):
                 #  continue
                 treefam = family + eval_results_delim + tree.replace(".geneTree.newick", "")
-                # if (os.path.isfile(os.path.join(fam.get_run_dir(datadir, subst_model, "generax_eval_run"), "results", treefam, "stats.txt"))):
-                # already evaluated
-                #  skip += 1
-                #  continue
-                empty = False
+                #if (os.path.isfile(
+                #        os.path.join(fam.get_run_dir(datadir, subst_model, "generax_eval_run"),
+                #                     "results", treefam, "stats.txt"))):
+                    # already evaluated
+                #    skip += 1
+                #    continue
                 writer.write("- " + treefam + "\n")
-                writer.write("starting_gene_tree = "
-                             + os.path.join(fam.get_gene_tree_dir(
-                    datadir, family), tree) + "\n")
+                writer.write("starting_gene_tree = ")
+                writer.write(os.path.join(
+                    fam.get_gene_tree_dir(datadir, family), tree) + "\n")
                 writer.write("alignment = " + alignment + "\n")
                 writer.write("mapping = " + mapping + "\n")
                 writer.write("subst_model = " + raxml_model + "\n")
+                empty = False
     print("~~~~ Skipped", skip, "trees from getting evaluated ~~~~")
     return empty
 
