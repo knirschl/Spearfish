@@ -19,7 +19,7 @@ def generate_scheduler_commands_file(datadir, subst_model, species_matrix, algo,
     with open(scheduler_commands_file, "w") as writer:
         for family in fam.get_families_list(datadir):
             if (not analyze_msa.has_distinct_seqs(
-                    fam.get_alignment_file(fam.get_family_path(datadir, family)))):
+                    fam.get_alignment(datadir, family))):
                 # not enough distinct sequences
                 continue
             spearfish_dir = fam.get_family_misc_dir(datadir, family)
@@ -58,18 +58,20 @@ def extract_spearfish_trees(datadir, subst_model):
             if (not (miscfile.startswith("spearfish." + subst_model) and miscfile.endswith(
                         ".newick"))):
                 continue
-            spearfishtree = os.path.join(fam.get_family_misc_dir(datadir, family), miscfile)
+            if ("startGeneTree" in miscfile):
+                continue
+            spearfish_tree = os.path.join(fam.get_family_misc_dir(datadir, family), miscfile)
             tree = os.path.join(fam.get_gene_tree_dir(datadir, family), miscfile)
-            if (os.path.isfile(spearfishtree) and os.stat(spearfishtree).st_size > 0):
+            if (os.path.isfile(spearfish_tree) and os.stat(spearfish_tree).st_size > 0):
                 valid += 1
-                shutil.copyfile(spearfishtree, tree)
+                shutil.copyfile(spearfish_tree, tree)
             else:
                 invalid += 1
                 try:
                     os.remove(tree)
                 except:
                     pass
-            os.remove(spearfishtree)
+            os.remove(spearfish_tree)
     print("Extracted " + str(valid) + " trees")
     if (invalid > 0):
         print("WARNING! " + str(invalid) + " trees were skipped")

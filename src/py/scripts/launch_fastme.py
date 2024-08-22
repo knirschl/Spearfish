@@ -34,7 +34,7 @@ def generate_scheduler_commands_file(datadir, subst_model, is_dna, algo, use_spr
     with open(scheduler_commands_file, "w") as writer:
         for family in fam.get_families_list(datadir):
             if (not analyze_msa.has_distinct_seqs(
-                    fam.get_alignment_file(fam.get_family_path(datadir, family)))):
+                    fam.get_alignment(datadir, family))):
                 # not enough distinct sequences
                 continue
             fastme_dir = fam.get_family_misc_dir(datadir, family)
@@ -94,7 +94,7 @@ def generate_scheduler_commands_file_matrices(datadir, mat_prefix, algo, use_spr
     with open(scheduler_commands_file, "w") as writer:
         for family in fam.get_families_list(datadir):
             if (not analyze_msa.has_distinct_seqs(
-                    fam.get_alignment_file(fam.get_family_path(datadir, family)))):
+                    fam.get_alignment(datadir, family))):
                 # not enough distinct sequences
                 # !! -> there shouldn't be any matrices except if left over from old runs
                 continue
@@ -139,25 +139,25 @@ def extract_fastme_trees(datadir, subst_model):
         for miscfile in os.listdir(fam.get_family_misc_dir(datadir, family)):
             if (not (("fastme" in miscfile) and miscfile.endswith(".newick"))):
                 continue
-            fastmetree = os.path.join(fam.get_family_misc_dir(datadir, family), miscfile)
+            fastme_tree = os.path.join(fam.get_family_misc_dir(datadir, family), miscfile)
             tree = os.path.join(fam.get_gene_tree_dir(datadir, family), miscfile)
-            # fastme_matrix = fam.get_fastme_distances(datadir, family, subst_model)
-            fastme_matrix = fastmetree.replace("geneTree.newick", "matrix.phy").replace("fastme.",
-                                                                                        "")
-            if (os.path.isfile(fastmetree) and os.stat(fastmetree).st_size > 0):
+            fastme_matrix = fastme_tree.replace("geneTree.newick", "matrix.phy").replace("fastme.", "")
+            if (os.path.isfile(fastme_tree) and os.stat(fastme_tree).st_size > 0):
                 valid += 1
-                shutil.copyfile(fastmetree, tree)
-                os.remove(fastmetree)
+                shutil.copyfile(fastme_tree, tree)
+                print(fastme_matrix)
             else:
                 invalid += 1
                 try:
                     os.remove(tree)
                     os.remove(fastme_matrix)
+                    os.remove(fastme_tree)
                 except:
                     pass
             try:
                 os.remove(fastme_matrix + "_fastme_stat.txt")
-                os.remove(fastmetree + "_fastme_stat.txt")
+                os.remove(fastme_matrix)
+                os.remove(fastme_tree)
             except:
                 pass
     print("Extracted " + str(valid) + " trees")
@@ -178,13 +178,12 @@ def extract_fastme_mats(datadir, subst_model):
         else:
             invalid += 1
             try:
-                os.remove(matrix)
                 os.remove(fastme_matrix)
             except:
                 pass
         try:
+            os.remove(fam.get_alignment_phylip(datadir, family) + "_fastme_stat.txt")
             os.remove(fastme_matrix)
-            os.remove(fastme_matrix + "_fastme_stat.txt")
         except:
             pass
     print("Extracted " + str(valid) + " matrices")

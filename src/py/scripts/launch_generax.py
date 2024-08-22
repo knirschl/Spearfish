@@ -55,8 +55,7 @@ def build_generax_families_file(datadir, starting_tree, subst_model, output):
         writer.write("[FAMILIES]\n")
         print("starting gene tree " + starting_tree)
         for family in fam.get_families_list(datadir):
-            family_path = fam.get_family_path(datadir, family)
-            if (not analyze_msa.has_distinct_seqs(fam.get_alignment_file(family_path))):
+            if (not analyze_msa.has_distinct_seqs(fam.get_alignment(datadir, family))):
                 # not enough distinct sequences
                 continue
             writer.write("- " + family + "\n")
@@ -64,7 +63,7 @@ def build_generax_families_file(datadir, starting_tree, subst_model, output):
             if (starting_tree == "random"):
                 gene_tree = "__random__"
             writer.write("starting_gene_tree = " + gene_tree + "\n")
-            writer.write("alignment = " + fam.get_alignment_file(family_path) + "\n")
+            writer.write("alignment = " + fam.get_alignment(datadir, family) + "\n")
             writer.write("mapping = " + fam.get_mappings(datadir, family) + "\n")
             raxml_model = ""
             if (starting_tree != "random" and starting_tree != "true"):
@@ -83,7 +82,7 @@ def build_generax_families_file_eval(datadir, subst_model, output, tree_prefix="
         writer.write("[FAMILIES]\n")
         for family in fam.get_families_list(datadir):
             if (not analyze_msa.has_distinct_seqs(
-                    fam.get_alignment_file(fam.get_family_path(datadir, family)))):
+                    fam.get_alignment(datadir, family))):
                 # not enough distinct sequences
                 # !! -> there shouldn't be any trees except if left over from old runs
                 continue

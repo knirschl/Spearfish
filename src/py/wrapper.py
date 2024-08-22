@@ -93,17 +93,17 @@ def test_optimized(datadir, subst_model, is_dna, cores=16):
         generax_subst_model = fm_subst_model
 
     # === Convert only once ===
-#    time_convert = convert_inputs(datadir, fm_subst_model, is_dna, cores)
+    time_convert = convert_inputs(datadir, fm_subst_model, is_dna, cores)
 #    # === Run all combinations ===
     time_inference = 0
-#    for infer_algo in [0, 2]:
-#        for tag_algo in [1]:#range(3):
-#            time_inference += infer_trees(datadir, fm_subst_model, is_dna,
-#                                          infer_algo, tag_algo, cores)
+    for infer_algo in [0, 2]:
+        for tag_algo in range(3):
+            time_inference += infer_trees(datadir, fm_subst_model, is_dna,
+                                          infer_algo, tag_algo, cores)
     # === Pick best tree in every family-tag combination ===
     time_pick = pick_trees(datadir, generax_subst_model, "spearfish-all", cores)
 
-#    print(f"End of Spearfish. Elapsed total time: {time_inference + time_pick}s")
+    print(f"End of Spearfish. Elapsed total time: {time_inference + time_pick}s")
 
 
 def run(datadir, subst_model, is_dna, cores, algo, compute):
