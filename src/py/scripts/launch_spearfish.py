@@ -23,7 +23,7 @@ def generate_scheduler_commands_file(datadir, subst_model, species_matrix, algo,
                 # not enough distinct sequences
                 continue
             spearfish_dir = fam.get_family_misc_dir(datadir, family)
-            alignment_matrix = fam.get_alignment_matrix(datadir, family)
+            alignment_matrix = fam.get_alignment_matrix(datadir, family, subst_model)
             try:
                 os.mkdir(spearfish_dir)
             except:

@@ -44,6 +44,8 @@ def generate_scheduler_commands_file(datadir, subst_model, is_dna, algo, use_spr
                 pass
             fastme_output = os.path.join(fastme_dir, "fastme." + subst_model + ".newick")
             fastme_matrix = fam.get_fastme_distances(datadir, family, subst_model)
+            if only_mat and os.path.exists(fam.get_alignment_matrix(datadir, family, subst_model)):
+                continue
             command = []
             command.append(family)
             command.append("1")
@@ -169,7 +171,7 @@ def extract_fastme_mats(datadir, subst_model):
     invalid = 0
     for family in os.listdir(families_dir):
         fastme_matrix = fam.get_fastme_distances(datadir, family, subst_model)
-        matrix = fam.get_alignment_matrix(datadir, family)
+        matrix = fam.get_alignment_matrix(datadir, family, subst_model)
         if (os.path.isfile(fastme_matrix) and os.stat(fastme_matrix).st_size > 0):
             valid += 1
             shutil.copyfile(fastme_matrix, matrix)
@@ -202,9 +204,13 @@ def run_fastme_on_families(datadir, subst_model, is_dna, algo, use_spr, only_mat
                              paths.mpi_scheduler_heuristic, cores, output_dir, "logs.txt")
     metrics.save_metrics(datadir, fam.get_run_name(fastme_name, subst_model), (time.time() - start),
                          "runtimes")
-    lb = fam.get_lb_from_run(output_dir)
-    metrics.save_metrics(datadir, fam.get_run_name(fastme_name, subst_model),
-                         (time.time() - start) * lb, "seqtimes")
+    try:
+        lb = fam.get_lb_from_run(output_dir)
+        metrics.save_metrics(datadir, fam.get_run_name(fastme_name, subst_model),
+                             (time.time() - start) * lb, "seqtimes")
+    except:
+        print("Couldn't get the runtime of this run (Probably got nothing to do)")
+        pass
     utils.printFlush("Finished FastME, now extracting")
     if not only_mat:
         extract_fastme_trees(datadir, subst_model)
