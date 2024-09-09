@@ -173,10 +173,12 @@ int main(int argc, char *argv[]) {
     //std::cout << "Start tree := " << tree_tagged->to_newick() << "\n" << tree_tagged->node_info() << "\n";
     switch (cli_parser.get_algo()) {
         case 0:
+            std::cout << "APro\n";
             tree_tagged->reroot_APro();
             out_prefix.append("a.");
             break;
         case 1: {
+            std::cout << "MADroot\n";
             // TODO? tree_tagged->tag_APro(tree_tagged->reroot_MAD());
             // MADroot reads from file and outputs to std::out
             write_newick(*tree_tagged, out_prefix + START_TREE_NWK_FILE);
@@ -196,6 +198,7 @@ int main(int argc, char *argv[]) {
             break;
         }
         default:
+            std::cout << "NTH\n";
             // as dup is initialized with false this is the same as S+G
             // (just a bit slower because of the lca computations below)
             out_prefix.append("+.");

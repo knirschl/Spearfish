@@ -497,6 +497,18 @@ public:
         return -1;
     }
 
+    std::vector<std::pair<int, int>> get_all_pairs() {
+        std::vector<std::pair<int, int>> pairs{};
+        for (int i{}; i < mdata.leaf_indices.size(); i++) {
+            int leaf1_id{tree[mdata.leaf_indices[i]].idx};
+            for (int j{i + 1}; j < mdata.leaf_indices.size(); j++) {
+                int leaf2_id{tree[mdata.leaf_indices[j]].idx};
+                pairs.emplace_back(leaf1_id, leaf2_id);
+            }
+        }
+        return pairs;
+    }
+
     /**
     * Computes all leaf pairs whose lowest common ancestor was not tagged as a duplication event.
     *

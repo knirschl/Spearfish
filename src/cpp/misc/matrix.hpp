@@ -99,11 +99,11 @@ public:
 
 private:
     static size_t len(const size_t r) {
-        return (r * r + r) >> 1;
+        return (r * r + r) / 2;
     }
     
     static size_t idx(const size_t r, const size_t c) {
-        return r == c ? 0 : ((r * (r - 1)) >> 1) + c + 1;
+        return r == c ? 0 : ((r * (r - 1)) / 2) + c + 1;
     }
 
     std::vector<T> matrix;
