@@ -254,8 +254,8 @@ def get_alignment_phylip(datadir, family):
     return os.path.join(get_family_path(datadir, family), "alignment.phy")
 
 
-def get_alignment_matrix(datadir, family):
-    return os.path.join(get_family_path(datadir, family), "alignment.msa.matrix.phy")
+def get_alignment_matrix(datadir, family, subst_model):
+    return os.path.join(get_family_path(datadir, family), f"alignment.msa.matrix_{subst_model}.phy")
 
 
 def get_true_tree(datadir, family):
@@ -363,14 +363,6 @@ def get_pythia_score_path(datadir, family):
 
 def get_pythia_score(datadir, family):
     return float(open(get_pythia_score_path(datadir, family)).read())
-
-
-def get_alignment_file(datadir):
-    return os.path.join(datadir, "alignment.msa")
-
-
-def get_alignment_matrix_file(datadir):
-    return os.path.join(datadir, "alignment.msa.matrix.phy")
 
 
 def get_raxml_best_model(datadir, subst_model, family):

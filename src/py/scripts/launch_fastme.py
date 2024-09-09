@@ -15,21 +15,26 @@ import analyze_msa
 import msa_converter
 
 
+dna_model = {"p": "p", "RYs": "Y", "RY": "R", "JC69": "J", "K2P": "K",
+             "F81": "1", "F84": "4", "TN93": "T", "LogDet": "L"}
+protein_model = {"p": "p", "F81": "F", "LG": "L", "WAG": "W", "JTT": "J",
+                 "Dayhoff": "h", "DCMut": "D", "CpRev": "C", "MtREV": "M",
+                 "RtREV": "R", "HIVb": "b", "HIVw": "I", "FLU": "U"}
+
+
 def generate_scheduler_commands_file(datadir, subst_model, is_dna, algo, use_spr, only_mat,
                                      output_dir):
     results_dir = os.path.join(output_dir, "results")
     scheduler_commands_file = os.path.join(output_dir, "commands.txt")
     gamma = False
     sp = subst_model.split("+")
-    fastme_model = subst_model
     if (len(sp) > 1 and sp[1] == "G"):
-        fastme_model = sp[0]
         gamma = True
-    fastme_model.removeprefix('F8')
+    fastme_model = [protein_model, dna_model][is_dna][sp[0]]
     with open(scheduler_commands_file, "w") as writer:
         for family in fam.get_families_list(datadir):
             if (not analyze_msa.has_distinct_seqs(
-                    fam.get_alignment_file(fam.get_family_path(datadir, family)))):
+                    fam.get_alignment(datadir, family))):
                 # not enough distinct sequences
                 continue
             fastme_dir = fam.get_family_misc_dir(datadir, family)
@@ -39,6 +44,8 @@ def generate_scheduler_commands_file(datadir, subst_model, is_dna, algo, use_spr
                 pass
             fastme_output = os.path.join(fastme_dir, "fastme." + subst_model + ".newick")
             fastme_matrix = fam.get_fastme_distances(datadir, family, subst_model)
+            if only_mat and os.path.exists(fam.get_alignment_matrix(datadir, family, subst_model)):
+                continue
             command = []
             command.append(family)
             command.append("1")
@@ -57,7 +64,7 @@ def generate_scheduler_commands_file(datadir, subst_model, is_dna, algo, use_spr
             else:
                 command.append("-p" + fastme_model)
             if (gamma):
-                command.append("1.0")
+                command.append("-g") # + alpha
             # output tree & matrix
             command.append("-o")
             command.append(fastme_output)
@@ -87,7 +94,7 @@ def generate_scheduler_commands_file_matrices(datadir, mat_prefix, algo, use_spr
     with open(scheduler_commands_file, "w") as writer:
         for family in fam.get_families_list(datadir):
             if (not analyze_msa.has_distinct_seqs(
-                    fam.get_alignment_file(fam.get_family_path(datadir, family)))):
+                    fam.get_alignment(datadir, family))):
                 # not enough distinct sequences
                 # !! -> there shouldn't be any matrices except if left over from old runs
                 continue
@@ -132,25 +139,25 @@ def extract_fastme_trees(datadir, subst_model):
         for miscfile in os.listdir(fam.get_family_misc_dir(datadir, family)):
             if (not (("fastme" in miscfile) and miscfile.endswith(".newick"))):
                 continue
-            fastmetree = os.path.join(fam.get_family_misc_dir(datadir, family), miscfile)
+            fastme_tree = os.path.join(fam.get_family_misc_dir(datadir, family), miscfile)
             tree = os.path.join(fam.get_gene_tree_dir(datadir, family), miscfile)
-            # fastme_matrix = fam.get_fastme_distances(datadir, family, subst_model)
-            fastme_matrix = fastmetree.replace("geneTree.newick", "matrix.phy").replace("fastme.",
-                                                                                        "")
-            if (os.path.isfile(fastmetree) and os.stat(fastmetree).st_size > 0):
+            fastme_matrix = fastme_tree.replace("geneTree.newick", "matrix.phy").replace("fastme.", "")
+            if (os.path.isfile(fastme_tree) and os.stat(fastme_tree).st_size > 0):
                 valid += 1
-                shutil.copyfile(fastmetree, tree)
-                os.remove(fastmetree)
+                shutil.copyfile(fastme_tree, tree)
+                print(fastme_matrix)
             else:
                 invalid += 1
                 try:
                     os.remove(tree)
                     os.remove(fastme_matrix)
+                    os.remove(fastme_tree)
                 except:
                     pass
             try:
                 os.remove(fastme_matrix + "_fastme_stat.txt")
-                os.remove(fastmetree + "_fastme_stat.txt")
+                os.remove(fastme_matrix)
+                os.remove(fastme_tree)
             except:
                 pass
     print("Extracted " + str(valid) + " trees")
@@ -164,20 +171,19 @@ def extract_fastme_mats(datadir, subst_model):
     invalid = 0
     for family in os.listdir(families_dir):
         fastme_matrix = fam.get_fastme_distances(datadir, family, subst_model)
-        matrix = fam.get_alignment_matrix(datadir, family)
+        matrix = fam.get_alignment_matrix(datadir, family, subst_model)
         if (os.path.isfile(fastme_matrix) and os.stat(fastme_matrix).st_size > 0):
             valid += 1
             shutil.copyfile(fastme_matrix, matrix)
         else:
             invalid += 1
             try:
-                os.remove(matrix)
                 os.remove(fastme_matrix)
             except:
                 pass
         try:
+            os.remove(fam.get_alignment_phylip(datadir, family) + "_fastme_stat.txt")
             os.remove(fastme_matrix)
-            os.remove(fastme_matrix + "_fastme_stat.txt")
         except:
             pass
     print("Extracted " + str(valid) + " matrices")
@@ -197,9 +203,13 @@ def run_fastme_on_families(datadir, subst_model, is_dna, algo, use_spr, only_mat
                              paths.mpi_scheduler_heuristic, cores, output_dir, "logs.txt")
     metrics.save_metrics(datadir, fam.get_run_name(fastme_name, subst_model), (time.time() - start),
                          "runtimes")
-    lb = fam.get_lb_from_run(output_dir)
-    metrics.save_metrics(datadir, fam.get_run_name(fastme_name, subst_model),
-                         (time.time() - start) * lb, "seqtimes")
+    try:
+        lb = fam.get_lb_from_run(output_dir)
+        metrics.save_metrics(datadir, fam.get_run_name(fastme_name, subst_model),
+                             (time.time() - start) * lb, "seqtimes")
+    except:
+        print("Couldn't get the runtime of this run (Probably got nothing to do)")
+        pass
     utils.printFlush("Finished FastME, now extracting")
     if not only_mat:
         extract_fastme_trees(datadir, subst_model)
@@ -213,7 +223,7 @@ def run_fastme_matrix(datadir, subst_model="p", is_dna=True, cores=1):
 
 def run_fastme_on_families_matrices(datadir, mat_prefix, algo, use_spr, cores):
     fastme_name = "fastme." + mat_prefix[:-1]
-    subst_model = mat_prefix.replace("ba", "").replace(".", "")
+    subst_model = mat_prefix.replace("spearfish", "").replace(".", "")
     output_dir = fam.get_run_dir(datadir, subst_model, fastme_name + "_run")
     shutil.rmtree(output_dir, True)
     os.makedirs(output_dir)

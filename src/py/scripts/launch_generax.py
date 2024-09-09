@@ -55,8 +55,7 @@ def build_generax_families_file(datadir, starting_tree, subst_model, output):
         writer.write("[FAMILIES]\n")
         print("starting gene tree " + starting_tree)
         for family in fam.get_families_list(datadir):
-            family_path = fam.get_family_path(datadir, family)
-            if (not analyze_msa.has_distinct_seqs(fam.get_alignment_file(family_path))):
+            if (not analyze_msa.has_distinct_seqs(fam.get_alignment(datadir, family))):
                 # not enough distinct sequences
                 continue
             writer.write("- " + family + "\n")
@@ -64,7 +63,7 @@ def build_generax_families_file(datadir, starting_tree, subst_model, output):
             if (starting_tree == "random"):
                 gene_tree = "__random__"
             writer.write("starting_gene_tree = " + gene_tree + "\n")
-            writer.write("alignment = " + fam.get_alignment_file(family_path) + "\n")
+            writer.write("alignment = " + fam.get_alignment(datadir, family) + "\n")
             writer.write("mapping = " + fam.get_mappings(datadir, family) + "\n")
             raxml_model = ""
             if (starting_tree != "random" and starting_tree != "true"):
@@ -83,7 +82,7 @@ def build_generax_families_file_eval(datadir, subst_model, output, tree_prefix="
         writer.write("[FAMILIES]\n")
         for family in fam.get_families_list(datadir):
             if (not analyze_msa.has_distinct_seqs(
-                    fam.get_alignment_file(fam.get_family_path(datadir, family)))):
+                    fam.get_alignment(datadir, family))):
                 # not enough distinct sequences
                 # !! -> there shouldn't be any trees except if left over from old runs
                 continue
@@ -93,24 +92,28 @@ def build_generax_families_file_eval(datadir, subst_model, output, tree_prefix="
             for tree in fam.get_gene_tree_list(datadir, family):
                 if (not tree.startswith(tree_prefix)):
                     continue
-                scale = float(re.search(r'(\d+(?:\.\d+)?)S~G', tree)[1])
+                if ("startGeneTree" in tree):
+                    continue
+                #scale = float(re.search(r'(\d+(?:\.\d+)?)S~G', tree)[1])
                 # if (scale < 1 or scale > 4.5):
                 #  continue
                 treefam = family + eval_results_delim + tree.replace(".geneTree.newick", "")
-                # if (os.path.isfile(os.path.join(fam.get_run_dir(datadir, subst_model, "generax_eval_run"), "results", treefam, "stats.txt"))):
-                # already evaluated
-                #  skip += 1
-                #  continue
-                empty = False
+                if (os.path.isfile(
+                        os.path.join(fam.get_run_dir(datadir, subst_model, "generax_eval_run"),
+                                     "results", treefam, "stats.txt"))):
+                    # already evaluated
+                    skip += 1
+                    continue
                 writer.write("- " + treefam + "\n")
-                writer.write("starting_gene_tree = "
-                             + os.path.join(fam.get_gene_tree_dir(
-                    datadir, family), tree) + "\n")
+                writer.write("starting_gene_tree = ")
+                writer.write(os.path.join(
+                    fam.get_gene_tree_dir(datadir, family), tree) + "\n")
                 writer.write("alignment = " + alignment + "\n")
                 writer.write("mapping = " + mapping + "\n")
                 writer.write("subst_model = " + raxml_model + "\n")
-        print("~~~~ Skipped", skip, "trees from getting evaluated ~~~~")
-        return empty
+                empty = False
+    print("~~~~ Skipped", skip, "trees from getting evaluated ~~~~")
+    return empty
 
 
 def get_generax_command(generax_families_file, species_tree, strategy, rec_model,
@@ -233,8 +236,11 @@ def eval_and_pick(datadir, results_dir):
             best_tree[true_family][idx] = tree
             best_logL[true_family][idx] = logL
         elif (logL == best_logL[true_family][idx]):
-            continue
-            # TODO if same: which one?
+            # if same, select lower scale
+            scale_best = float(re.search(r'(\d+(?:\.\d+)?)S~G', best_tree[true_family][idx])[1])
+            scale_this = float(re.search(r'(\d+(?:\.\d+)?)S~G', tree)[1])
+            if scale_this < scale_best:
+                best_tree[true_family][idx] = tree
     with open(os.path.join(fam.get_metrics_dir(datadir), "generax_picks.txt"), "w") as writer:
         for family in best_tree:
             # pick = best_tree[family]
